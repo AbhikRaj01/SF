@@ -104,7 +104,7 @@ const GetStartedPage = () => {
                     <span className="course-level">{course.level}</span>
                     <button 
                       className="btn-continue"
-                      onClick={() => handleContinue(course.language)}
+                      onClick={() => navigate('/python-questions')}
                     >
                       Continue
                     </button>

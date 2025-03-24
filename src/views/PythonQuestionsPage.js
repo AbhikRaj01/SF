@@ -1,15 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './PythonQuestionsPage.css';
 
 const PythonQuestionsPage = () => {
+  const { questionId } = useParams();
   const [answer, setAnswer] = useState('');
   const [pyodide, setPyodide] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [question, setQuestion] = useState(null);
   const navigate = useNavigate();
 
-  // Initialize Pyodide
+  const pythonQuestions = [
+    {
+      id: 1,
+      text: `Write a Python function to calculate the factorial of a number. 
+             The function should take an integer as input and return its factorial. 
+             For example, factorial(5) should return 120.`,
+      testCases: [
+        { input: 5, output: 120 },
+        { input: 0, output: 1 },
+        { input: 1, output: 1 },
+        { input: 7, output: 5040 },
+      ],
+    },
+    {
+      id: 2,
+      text: `Write a Python function to check if a string is a palindrome. 
+             A palindrome is a string that reads the same backward as forward. 
+             For example, "madam" is a palindrome.`,
+      testCases: [
+        { input: '"madam"', output: true },
+        { input: '"hello"', output: false },
+        { input: '"racecar"', output: true },
+        { input: '"python"', output: false },
+      ],
+    },
+    {
+      id: 3,
+      text: `Write a Python function to find the largest number in a list. 
+             The function should take a list of numbers as input and return the largest number. 
+             For example, for the list [3, 5, 7, 2], the function should return 7.`,
+      testCases: [
+        { input: '[3, 5, 7, 2]', output: 7 },
+        { input: '[-1, -5, -3]', output: -1 },
+        { input: '[10]', output: 10 },
+        { input: '[0, 0, 0]', output: 0 },
+      ],
+    },
+    {
+      id: 4,
+      text: `Write a Python function to reverse a string. 
+             The function should take a string as input and return the reversed string. 
+             For example, for the input "hello", the function should return "olleh".`,
+      testCases: [
+        { input: '"hello"', output: '"olleh"' },
+        { input: '"python"', output: '"nohtyp"' },
+        { input: '"racecar"', output: '"racecar"' },
+        { input: '""', output: '""' },
+      ],
+    },
+  ];
+
   useEffect(() => {
+    // Find the question based on the questionId
+    const selectedQuestion = pythonQuestions.find(
+      (q) => q.id === parseInt(questionId)
+    );
+    setQuestion(selectedQuestion);
+
+    // Initialize Pyodide
     const loadPyodide = async () => {
       const pyodideInstance = await window.loadPyodide({
         indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.21.3/full/',
@@ -18,27 +77,13 @@ const PythonQuestionsPage = () => {
       setIsLoading(false);
     };
     loadPyodide();
-  }, []);
-
-  // Real-life Python problem
-  const question = {
-    id: 1,
-    text: `Write a Python function to calculate the factorial of a number. 
-           The function should take an integer as input and return its factorial. 
-           For example, factorial(5) should return 120.`,
-    testCases: [
-      { input: 5, output: 120 },
-      { input: 0, output: 1 },
-      { input: 1, output: 1 },
-      { input: 7, output: 5040 },
-    ],
-  };
+  }, [questionId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!pyodide) {
-      alert('Python environment is still loading. Please wait...');
+    if (!pyodide || !question) {
+      alert('Python environment or question is not ready. Please wait...');
       return;
     }
 
@@ -68,7 +113,7 @@ const PythonQuestionsPage = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !question) {
     return <div>Loading Python environment...</div>;
   }
 
@@ -97,7 +142,7 @@ const PythonQuestionsPage = () => {
 
       {/* Back Button */}
       <button onClick={() => navigate(-1)} className="btn-back">
-        Back to Dashboard
+        Back to Questions List
       </button>
     </div>
   );
